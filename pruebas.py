@@ -1,0 +1,1 @@
+f= open("root/guru99.txt","w+")
