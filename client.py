@@ -7,7 +7,7 @@ import time
 
 class Client:
     def __init__(self):
-        self.server = Pyro4.Proxy('PYRONAME:dfs.server@192.168.0.43')
+        self.server = Pyro4.Proxy('PYRONAME:dfs.server@172.16.14.71')
         self.abort = 0
         #self.openFiles = {}
     
@@ -35,16 +35,24 @@ class Client:
                     if line == '1':
                         tem = input("Ingrese el número del archivo que quiere ver: ")
                         #print("wtf"+tem)
+                        #obtener informción del archivo
                         dir = self.tree[int(tem)][4]
                         content = self.server.fetch(dir)
+                        #crear copia en en caché
                         writeBUffer = open(self.tree[int(tem)][3],"w+")
                         writeBUffer.write(content)
                         writeBUffer.close()
+                        checktime = os.path.getmtime(self.tree[int(tem)][3])
+                        print(checktime)
                         programName = "notepad.exe"
-                        p = sp.Popen([programName, dir])
+                        p = sp.Popen([programName,self.tree[int(tem)][3]])
                         #print(p)
                         while p.poll() == None:
                             pass
+                        print(os.path.getmtime(self.tree[int(tem)][3]))
+                        if checktime != os.path.getmtime(self.tree[int(tem)][3]):
+                            print("Has salvado!")
+                        #borrar copia
                         os.remove(self.tree[int(tem)][3])   
                         
                     if line == '2':
@@ -54,8 +62,8 @@ class Client:
                         print(dir)
                         tem2 = input("Ingrese el nombre del archivo: ")
                         ruta = dir + '/' +tem2
-                        print(ruta)
-                        self.server.createFile(int(tem),tem2,ruta,"hola")
+                        #print(ruta)
+                        self.server.createFile(int(tem),tem2,ruta)
                         
                     if line == '3':
                         self.printFiles(-1,0)
@@ -88,7 +96,18 @@ class Client:
         #    refresh = input("No puede continuar si no da refresh")
         self.tree = self.server.getTree()
         self.printFiles(-1,0)
-        
+
+    @Pyro4.expose
+    @Pyro4.oneway
+    @Pyro4.callback 
+    def update(self,index):
+        for i,filename in enumerate(self.tree):
+            if(i == index):
+                #marcar como modificado
+                self.tree[index][2] = 1
+                break
+        print("Se hizo un cambio al archivo")
+
     def printFiles(self,parent,level):
         #print(tree[parent][3])
         for i,filename in enumerate(self.tree):
@@ -107,7 +126,7 @@ class DaemonThread(threading.Thread):
 
     def run(self):
         #set host to ip address of client
-        with Pyro4.core.Daemon(host="192.168.0.43") as daemon:
+        with Pyro4.core.Daemon(host="172.16.14.71") as daemon:
             daemon.register(self.client)
             daemon.requestLoop(lambda: not self.client.abort)
 

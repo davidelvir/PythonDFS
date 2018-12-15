@@ -36,10 +36,10 @@ class Server(object):
                 print("Se ha desconectado un cliente")
                 break
         
-    def createFile(self,parent,name,dir,content):
+    def createFile(self,parent,name,dir):
         writeBUffer = open(dir,"w+")
         self.tree.append((parent,1,0,name,dir))
-        writeBUffer.write(content)
+        #writeBUffer.write(content)
         for (n,c) in self.clients:
             c.updateTree()
         writeBUffer.close()
@@ -50,6 +50,14 @@ class Server(object):
         for (n,c) in self.clients:
             c.updateTree()
 
+    def save(self,parent,name,dir,content):
+        writeBUffer = open(dir,"w+")
+        self.tree.append((parent,1,0,name,dir))
+        writeBUffer.write(content)
+        for (n,c) in self.clients:
+            c.updateTree()
+        writeBUffer.close()
+        
     def fillTree(self):
         tem = self.pastDir
         temI = self.pastDirIndex
@@ -73,6 +81,12 @@ class Server(object):
         self.dirIndex = temI
         self.currDir = tem
     
+    def change(self,index,client,content):
+        for (n,c) in self.clients:
+            if(n != client):
+                #c.change()
+                break
+
     def getTree(self):
         return self.tree
         
@@ -88,5 +102,5 @@ class Server(object):
 
 Pyro4.Daemon.serveSimple(
     {Server: "dfs.server"},
-    host = "192.168.0.43"
+    host = "172.16.14.71"
     )
