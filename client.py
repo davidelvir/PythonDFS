@@ -7,7 +7,7 @@ import time
 
 class Client:
     def __init__(self):
-        self.server = Pyro4.Proxy('PYRONAME:dfs.server@172.16.14.71')
+        self.server = Pyro4.Proxy('PYRONAME:dfs.server@192.168.0.43')
         self.abort = 0
         #self.openFiles = {}
     
@@ -52,7 +52,10 @@ class Client:
                         print(os.path.getmtime(self.tree[int(tem)][3]))
                         if checktime != os.path.getmtime(self.tree[int(tem)][3]):
                             print("Has salvado!")
-                        #borrar copia
+                        readBUffer = open(self.tree[int(tem)][3],"r")
+                        content = readBUffer.read()
+                        readBUffer.close()
+                        self.server.save(self.tree[int(tem)][0],self.tree[int(tem)][3],self.tree[int(tem)][4],content)
                         os.remove(self.tree[int(tem)][3])   
                         
                     if line == '2':
@@ -126,7 +129,7 @@ class DaemonThread(threading.Thread):
 
     def run(self):
         #set host to ip address of client
-        with Pyro4.core.Daemon(host="172.16.14.71") as daemon:
+        with Pyro4.core.Daemon(host="192.168.0.43") as daemon:
             daemon.register(self.client)
             daemon.requestLoop(lambda: not self.client.abort)
 
