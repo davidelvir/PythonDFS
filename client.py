@@ -34,48 +34,57 @@ class Client:
                     line = input("Ingrese el número de la opción que desea: ")
                     if line == '1':
                         tem = input("Ingrese el número del archivo que quiere ver: ")
-                        #print("wtf"+tem)
-                        #obtener informción del archivo
-                        dir = self.tree[int(tem)][4]
-                        content = self.server.fetch(dir)
-                        #crear copia en en caché
-                        writeBUffer = open(self.tree[int(tem)][3],"w+")
-                        writeBUffer.write(content)
-                        writeBUffer.close()
-                        checktime = os.path.getmtime(self.tree[int(tem)][3])
-                        print(checktime)
-                        programName = "notepad.exe"
-                        p = sp.Popen([programName,self.tree[int(tem)][3]])
-                        #print(p)
-                        while p.poll() == None:
-                            pass
-                        print(os.path.getmtime(self.tree[int(tem)][3]))
-                        if checktime != os.path.getmtime(self.tree[int(tem)][3]):
-                            print("Has salvado!")
-                        readBUffer = open(self.tree[int(tem)][3],"r")
-                        content = readBUffer.read()
-                        readBUffer.close()
-                        self.server.save(self.tree[int(tem)][0],self.tree[int(tem)][3],self.tree[int(tem)][4],content)
-                        os.remove(self.tree[int(tem)][3])   
+                        if(self.tree[int(tem)][1] == 0):
+                            print("¡Debe elegir un archivo!")
+                        else:
+                            dir = self.tree[int(tem)][4]#se consigue la ruta del archivo
+                            content = self.server.fetch(dir)#crear copia del contenido
+                            writeBUffer = open(self.tree[int(tem)][3],"w+")#crear copia en en caché
+                            writeBUffer.write(content)
+                            writeBUffer.close()
+                            checktime = os.path.getmtime(self.tree[int(tem)][3])#capturar el tiempo para verificar modificaciones
+                            #print(checktime)
+                            programName = "notepad.exe"#nombre del editor
+                            p = sp.Popen([programName,self.tree[int(tem)][3]])#abrir archivo en el editor
+                            #print(p)
+                            while p.poll() == None:#mientras el archivo esté abierto esperar
+                                pass
+                            #print(os.path.getmtime(self.tree[int(tem)][3]))
+                            if self.tree[int(tem)][2] == 1:#revisar si la copia no está invalidad
+                                print("Su copia no es válida, si hizo cambios no se van a guardar.")
+                            else:
+                                if checktime != os.path.getmtime(self.tree[int(tem)][3]):#revisar si se modificó el archivo
+                                    print("Has salvado!")
+                                    readBUffer = open(self.tree[int(tem)][3],"r")
+                                    content = readBUffer.read()
+                                    readBUffer.close()
+                                    self.server.save(int(tem),self.name,self.tree[int(tem)][4],content)#guardar cambio en el servidor
+                            os.remove(self.tree[int(tem)][3])#borrar el archivo en caché   
                         
                     if line == '2':
                         tem = input("Ingrese el directorio en el que desea crear un archivo: ")
                         #print(int(tem))
-                        dir = self.tree[int(tem)][4]
-                        print(dir)
-                        tem2 = input("Ingrese el nombre del archivo: ")
-                        ruta = dir + '/' +tem2
-                        #print(ruta)
-                        self.server.createFile(int(tem),tem2,ruta)
+                        if self.tree[int(tem)][1] == 1:
+                            print("¡ Debe seleccionar un directorio !")
+                        else: 
+                            dir = self.tree[int(tem)][4]
+                            #print(dir)
+                            tem2 = input("Ingrese el nombre del archivo: ")
+                            ruta = dir + '/' +tem2
+                            #print(ruta)
+                            self.server.createFile(int(tem),tem2,ruta)
                         
                     if line == '3':
                         self.printFiles(-1,0)
                     if line == '4':
                         tem = input("Ingrese el directorio en el que desea crear su nuevo directorio: ")
-                        dir = self.tree[int(tem)][4]
-                        tem2 = input("Ingrese el nombre del directorio: ")
-                        ruta = dir + '/' +tem2
-                        self.server.mkDir(int(tem),tem2,ruta)
+                        if self.tree[int(tem)][1] == 1:
+                            print("¡ Debe seleccionar in directorio !")
+                        else: 
+                            dir = self.tree[int(tem)][4]
+                            tem2 = input("Ingrese el nombre del directorio: ")
+                            ruta = dir + '/' +tem2
+                            self.server.mkDir(int(tem),tem2,ruta)
                     if line == '5':
                         
                         break
@@ -104,12 +113,8 @@ class Client:
     @Pyro4.oneway
     @Pyro4.callback 
     def update(self,index):
-        for i,filename in enumerate(self.tree):
-            if(i == index):
-                #marcar como modificado
-                self.tree[index][2] = 1
-                break
-        print("Se hizo un cambio al archivo")
+        self.tree[index][2] = 1
+        print("Se hizo un cambio al archivo: " + self.tree[index][3])
 
     def printFiles(self,parent,level):
         #print(tree[parent][3])

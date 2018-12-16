@@ -13,7 +13,7 @@ class Server(object):
         self.pastDir = ''
         self.dirIndex = 0
         self.pastDirIndex = 0
-        self.tree.append((-1, 0, 0, "root",'root'))
+        self.tree.append([-1, 0, 0, "root",'root'])
         self.fillTree()
 
     def join(self, name, callback):
@@ -38,7 +38,7 @@ class Server(object):
         
     def createFile(self,parent,name,dir):
         writeBUffer = open(dir,"w+")
-        self.tree.append((parent,1,0,name,dir))
+        self.tree.append([parent,1,0,name,dir])
         #writeBUffer.write(content)
         for (n,c) in self.clients:
             c.updateTree()
@@ -46,17 +46,19 @@ class Server(object):
 
     def mkDir(self,parent,name,dir):
         os.mkdir(dir)#poner 0777 si no funciona
-        self.tree.append((parent,0,0,name,dir))
+        self.tree.append([parent,0,0,name,dir])
         for (n,c) in self.clients:
             c.updateTree()
 
-    def save(self,parent,name,dir,content):
+    def save(self,index,client,dir,content):
         writeBUffer = open(dir,"w+")
-        self.tree.append((parent,1,0,name,dir))
+        #self.tree.append((parent,1,0,name,dir))
         writeBUffer.write(content)
-        for (n,c) in self.clients:
-            c.updateTree()
         writeBUffer.close()
+        for (n,c) in self.clients:
+            if(n != client):
+                c.update(index)
+        
         
     def fillTree(self):
         tem = self.pastDir
@@ -68,14 +70,14 @@ class Server(object):
                 
                 
                 self.currDir = self.currDir+'/'+filename
-                node = (self.dirIndex,0,0,filename,self.currDir)
+                node = [self.dirIndex,0,0,filename,self.currDir]
                 self.tree.append(node)
                 self.pastDirIndex = self.dirIndex
                 self.dirIndex = self.tree.index(node)
                 
                 self.fillTree()
             else:
-                node = (self.dirIndex,1,0,filename,self.currDir+'/'+filename)
+                node = [self.dirIndex,1,0,filename,self.currDir+'/'+filename]
                 self.tree.append(node)
         
         self.dirIndex = temI
@@ -102,5 +104,5 @@ class Server(object):
 
 Pyro4.Daemon.serveSimple(
     {Server: "dfs.server"},
-    host = "172.16.14.71"
+    host = "192.168.0.43"
     )
