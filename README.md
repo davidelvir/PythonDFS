@@ -1,4 +1,4 @@
-# PythonDFS
+﻿# PythonDFS
 Instalen python 3+ primero !
 Pueden editar en vscode o bajar el ide pycharm
 Despues abren la carpeta Serpent-master y ejecutan en consola: python setup.py install
@@ -18,7 +18,7 @@ Para usar el DFS:
                   host = "SuIp"
                   )
     
-    2) Abran una consola y corran: python -m Pyr04.naming --host SuIP
+    2) Abran una consola y corran: python -m Pyro4.naming --host SuIP
     3) Corran el server solo con python server.py
     4) Corran un cliente solo con python client.py (pueden abrir los clientes que quieran)
     5) Si sos Calvin: No sé si mac tiene notepad, así que buscá la línea 47 donde dice programName = "notepad.exe" y cambiá notepad por el equivalente tuyo
