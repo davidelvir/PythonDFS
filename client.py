@@ -7,7 +7,7 @@ import time
 
 class Client:
     def __init__(self):
-        self.server = Pyro4.Proxy('PYRONAME:dfs.server@192.168.0.43')
+        self.server = Pyro4.Proxy('PYRONAME:dfs.server@192.168.1.57')
         self.abort = 0
         #self.openFiles = {}
     
@@ -129,7 +129,7 @@ class DaemonThread(threading.Thread):
 
     def run(self):
         #set host to ip address of client
-        with Pyro4.core.Daemon(host="192.168.0.43") as daemon:
+        with Pyro4.core.Daemon(host="192.168.1.57") as daemon:
             daemon.register(self.client)
             daemon.requestLoop(lambda: not self.client.abort)
 

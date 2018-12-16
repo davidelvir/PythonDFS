@@ -23,3 +23,5 @@ Para usar el DFS:
     4) Corran un cliente solo con python client.py (pueden abrir los clientes que quieran)
     5) Si sos Calvin: No sé si mac tiene notepad, así que buscá la línea 47 donde dice programName = "notepad.exe" y cambiá notepad por el equivalente tuyo
     
+Dirección IPv4: 192.168.1.57
+

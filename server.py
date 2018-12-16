@@ -102,5 +102,5 @@ class Server(object):
 
 Pyro4.Daemon.serveSimple(
     {Server: "dfs.server"},
-    host = "172.16.14.71"
+    host = "192.168.1.57"
     )
