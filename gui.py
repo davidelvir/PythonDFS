@@ -32,13 +32,14 @@ while True:     # Event Loop
     if event is None:
         break
     if event == 'Update':
-        treedata = sg.TreeData()
+        print(event, values)
+        sg.TreeData()
         treedata.Insert("", '_A_', 'A', [1, 2, 3])
         treedata.Insert("", '_B_', 'B', [4, 5, 6])
         treedata.Insert("_A_", '_A1_', 'A1', ['can','can','can','can','can'])
         treedata.Insert("", '_C_', 'C', [])
         treedata.Insert("_C_", '_C1_', 'C1', ['or'])
         treedata.Insert("_A_", '_A2_', 'A2', [None, None])
-        window.FindElement('_TREE_').Update(treedata)
+        window.FindElement('_TREE_').clear()
     elif event == 'Read':
         print(event, values)
